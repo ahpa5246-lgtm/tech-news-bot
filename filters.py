@@ -16,7 +16,7 @@ TECH_KEYWORDS = {
 LOW_VALUE_KEYWORDS = {"celebrity", "sports", "recipe", "fashion", "reality show", "horoscope", "gossip"}
 PROMOTIONAL_HARM_KEYWORDS = {
     "porn", "pornography", "xxx", "sex tape", "sexual exploitation", "racial supremacy",
-    "ethnic hatred", "terrorist recruitment", "terrorist propaganda", "how to make a bomb",
+    "ethnic hatred", "extremist networks", "terrorist recruitment", "terrorist propaganda", "how to make a bomb",
     "buy illegal drugs", "drug dealer", "graphic gore", "nsfw content",
 }
 SENSITIVE_REPORTING_TERMS = {"research", "report", "investigation", "safety", "cybersecurity", "policy", "analysis"}

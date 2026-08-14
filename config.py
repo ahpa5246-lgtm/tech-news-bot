@@ -19,6 +19,11 @@ USER_AGENT = os.getenv(
     "RSS_USER_AGENT",
     "TechNewsCollector/1.0 (+https://example.invalid; contact: admin@example.invalid)",
 )
+AI_PROVIDER = os.getenv("AI_PROVIDER", "").strip().casefold()
+AI_MODEL = os.getenv("AI_MODEL", "gpt-5-mini")
+AI_API_KEY = os.getenv("AI_API_KEY", "").strip() or None
+AI_API_BASE = os.getenv("AI_API_BASE", "").strip() or None
+AI_TIMEOUT_SECONDS = float(os.getenv("AI_TIMEOUT_SECONDS", "45"))
 
 # Keep this mapping easy to edit. Disabled sources are documented in README.md.
 RSS_FEEDS: dict[str, str] = {
@@ -49,5 +54,10 @@ class Settings:
     request_timeout_seconds: float = REQUEST_TIMEOUT_SECONDS
     min_importance_score: int = MIN_IMPORTANCE_SCORE
     user_agent: str = USER_AGENT
+    ai_provider: str = AI_PROVIDER
+    ai_model: str = AI_MODEL
+    ai_api_key: str | None = AI_API_KEY
+    ai_api_base: str | None = AI_API_BASE
+    ai_timeout_seconds: float = AI_TIMEOUT_SECONDS
 
 settings = Settings()

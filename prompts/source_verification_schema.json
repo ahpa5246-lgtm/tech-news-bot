@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "status": {"type": "string", "enum": ["VERIFIED", "REVIEW", "RESEARCH_ERROR"]},
+    "source_accessible": {"type": "boolean"},
+    "source_title": {"type": ["string", "null"]},
+    "source_domain": {"type": ["string", "null"]},
+    "publication_date": {"type": ["string", "null"]},
+    "canonical_url": {"type": ["string", "null"]},
+    "verified_claims": {"type": "array", "items": {"type": "string"}},
+    "unsupported_claims": {"type": "array", "items": {"type": "string"}},
+    "verification_summary": {"type": "string"},
+    "safety_flags": {"type": "array", "items": {"type": "string"}},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "error": {"type": ["string", "null"]}
+  },
+  "required": ["status", "source_accessible", "source_title", "source_domain", "publication_date", "canonical_url", "verified_claims", "unsupported_claims", "verification_summary", "safety_flags", "confidence", "error"],
+  "additionalProperties": false
+}
