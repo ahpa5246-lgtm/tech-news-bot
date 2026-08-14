@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "decision": {"type": "string", "enum": ["PUBLISH", "REVIEW", "REJECT"]},
+    "title": {"type": "string", "minLength": 8, "maxLength": 180},
+    "post_text": {"type": "string", "minLength": 50, "maxLength": 1400},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 500},
+    "news_angle": {"type": "string", "minLength": 1, "maxLength": 120},
+    "source_label": {"type": "string", "minLength": 1, "maxLength": 120},
+    "source_url": {"type": "string", "minLength": 1},
+    "hashtags": {"type": "array", "maxItems": 4, "items": {"type": "string", "pattern": "^#[\\u0600-\\u06FFA-Za-z0-9_]+$"}},
+    "safety_flags": {"type": "array", "items": {"type": "string"}},
+    "unsupported_claims": {"type": "array", "items": {"type": "string"}},
+    "editorial_notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["decision", "title", "post_text", "summary", "news_angle", "source_label", "source_url", "hashtags", "safety_flags", "unsupported_claims", "editorial_notes"],
+  "additionalProperties": false
+}

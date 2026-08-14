@@ -51,6 +51,24 @@ RESEARCH_COLUMNS: dict[str, str] = {
     "research_error": "TEXT"
 }
 
+WRITER_COLUMNS: dict[str, str] = {
+    "writer_status": "TEXT NOT NULL DEFAULT 'WRITING_PENDING'",
+    "written_at": "TEXT",
+    "writer_decision": "TEXT",
+    "writer_title": "TEXT",
+    "writer_post": "TEXT",
+    "writer_summary": "TEXT",
+    "writer_news_angle": "TEXT",
+    "writer_source_label": "TEXT",
+    "writer_source_url": "TEXT",
+    "writer_hashtags": "TEXT",
+    "writer_safety_flags": "TEXT",
+    "writer_unsupported_claims": "TEXT",
+    "writer_editorial_notes": "TEXT",
+    "writer_model": "TEXT",
+    "writer_error": "TEXT"
+}
+
 
 class NewsDatabase:
     def __init__(self, path: Path) -> None:
@@ -78,7 +96,7 @@ class NewsDatabase:
             )"""
         )
         existing = {row["name"] for row in self.connection.execute("PRAGMA table_info(articles)")}
-        for columns in (AI_COLUMNS, RESEARCH_COLUMNS):
+        for columns in (AI_COLUMNS, RESEARCH_COLUMNS, WRITER_COLUMNS):
             for name, definition in columns.items():
                 if name not in existing:
                     self.connection.execute(f"ALTER TABLE articles ADD COLUMN {name} {definition}")
@@ -212,6 +230,55 @@ class NewsDatabase:
         self.connection.execute(
             "UPDATE articles SET research_status = 'RESEARCH_ERROR', researched_at = ?, research_error = ? WHERE id = ?",
             (datetime.now(timezone.utc).isoformat(), error[:2000], article_id),
+        )
+        self.connection.commit()
+
+    def get_writing_pending(self, limit: int | None = None, rewrite: bool = False) -> list[sqlite3.Row]:
+        query = """SELECT * FROM articles
+                   WHERE status IN ('ACCEPTED', 'REVIEW')
+                     AND research_status IN ('VERIFIED', 'REVIEW', 'RESEARCH_ERROR')"""
+        params: list[object] = []
+        if not rewrite:
+            query += " AND writer_status NOT IN ('GENERATED', 'REVIEW', 'REJECTED', 'WRITING')"
+        query += " ORDER BY importance_score DESC, COALESCE(published_at, collected_at) DESC"
+        if limit is not None:
+            query += " LIMIT ?"
+            params.append(limit)
+        return list(self.connection.execute(query, params).fetchall())
+
+    def mark_writing(self, article_id: int) -> None:
+        self.connection.execute(
+            "UPDATE articles SET writer_status = 'WRITING', writer_error = NULL WHERE id = ?",
+            (article_id,),
+        )
+        self.connection.commit()
+
+    def save_writer(self, article_id: int, result: dict, model: str | None) -> None:
+        now = datetime.now(timezone.utc).isoformat()
+        decision = result.get("decision", "REVIEW")
+        status = "GENERATED" if decision == "PUBLISH" else ("REJECTED" if decision == "REJECT" else "REVIEW")
+        self.connection.execute(
+            """UPDATE articles SET writer_status = ?, written_at = ?, writer_decision = ?,
+                writer_title = ?, writer_post = ?, writer_summary = ?, writer_news_angle = ?,
+                writer_source_label = ?, writer_source_url = ?, writer_hashtags = ?,
+                writer_safety_flags = ?, writer_unsupported_claims = ?, writer_editorial_notes = ?,
+                writer_model = ?, writer_error = NULL
+            WHERE id = ?""",
+            (
+                status, now, decision, result.get("title"), result.get("post_text"), result.get("summary"),
+                result.get("news_angle"), result.get("source_label"), result.get("source_url"),
+                json.dumps(result.get("hashtags", []), ensure_ascii=False),
+                json.dumps(result.get("safety_flags", []), ensure_ascii=False),
+                json.dumps(result.get("unsupported_claims", []), ensure_ascii=False),
+                json.dumps(result.get("editorial_notes", []), ensure_ascii=False), model, article_id,
+            ),
+        )
+        self.connection.commit()
+
+    def save_writer_error(self, article_id: int, error: str, model: str | None = None) -> None:
+        self.connection.execute(
+            "UPDATE articles SET writer_status = 'WRITING_ERROR', written_at = ?, writer_error = ?, writer_model = ? WHERE id = ?",
+            (datetime.now(timezone.utc).isoformat(), error[:2000], model, article_id),
         )
         self.connection.commit()
 

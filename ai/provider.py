@@ -32,6 +32,14 @@ def load_verification_schema() -> dict[str, Any]:
     return json.loads((PROMPT_DIR / "source_verification_schema.json").read_text(encoding="utf-8"))
 
 
+def load_writer_prompt() -> str:
+    return (PROMPT_DIR / "arabic_news_writer_system.txt").read_text(encoding="utf-8")
+
+
+def load_writer_schema() -> dict[str, Any]:
+    return json.loads((PROMPT_DIR / "arabic_news_writer_schema.json").read_text(encoding="utf-8"))
+
+
 class OpenAICompatibleProvider:
     def __init__(self, settings: ProviderSettings) -> None:
         self.settings = settings
@@ -104,6 +112,9 @@ class OpenAICompatibleProvider:
 
     def verify_source(self, research_payload: dict[str, Any]) -> dict[str, Any]:
         return self._complete(load_verification_prompt(), research_payload, "source_verification", load_verification_schema())
+
+    def write_article(self, writer_payload: dict[str, Any]) -> dict[str, Any]:
+        return self._complete(load_writer_prompt(), writer_payload, "arabic_news_writer", load_writer_schema())
 
 
 def build_provider(settings: ProviderSettings) -> OpenAICompatibleProvider | None:

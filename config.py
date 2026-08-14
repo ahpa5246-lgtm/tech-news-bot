@@ -24,6 +24,7 @@ AI_MODEL = os.getenv("AI_MODEL", "gpt-5-mini")
 AI_API_KEY = os.getenv("AI_API_KEY", "").strip() or None
 AI_API_BASE = os.getenv("AI_API_BASE", "").strip() or None
 AI_TIMEOUT_SECONDS = float(os.getenv("AI_TIMEOUT_SECONDS", "45"))
+WRITER_MAX_POST_CHARS = int(os.getenv("WRITER_MAX_POST_CHARS", "1400"))
 
 # Keep this mapping easy to edit. Disabled sources are documented in README.md.
 RSS_FEEDS: dict[str, str] = {
@@ -59,5 +60,6 @@ class Settings:
     ai_api_key: str | None = AI_API_KEY
     ai_api_base: str | None = AI_API_BASE
     ai_timeout_seconds: float = AI_TIMEOUT_SECONDS
+    writer_max_post_chars: int = WRITER_MAX_POST_CHARS
 
 settings = Settings()
