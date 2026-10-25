@@ -1,5 +1,34 @@
 # Tech News Collector
 
+## Download, setup and project overview
+
+A technology-news collection, research and Arabic drafting pipeline.
+
+RSS ingestion; deduplication; SQLite state; optional AI analysis; source extraction; editorial gates.
+
+![Project workflow illustration](docs/project-overview.svg)
+
+[Download source ZIP](https://github.com/ahpa5246-lgtm/tech-news-bot/archive/refs/heads/main.zip) · [Changes and branches](https://github.com/ahpa5246-lgtm/tech-news-bot/branches) · [Verification notes](docs/QUALITY_REVIEW.md)
+
+The ZIP contains source code. Installation steps and external runtime requirements are listed below.
+
+```bash
+git clone https://github.com/ahpa5246-lgtm/tech-news-bot.git
+cd tech-news-bot
+```
+
+From the repository directory:
+
+```text
+python -m venv .venv
+# Activate .venv before installing packages.
+python -m pip install -r requirements.txt
+python main.py
+```
+
+The diagram is a project illustration. Test results and runtime limitations are recorded in [the review](docs/QUALITY_REVIEW.md); it is not a production-readiness certification.
+
+
 مكوّن أولي لجمع أخبار التقنية والبرمجيات والبرمجة من مصادر RSS/Atom موثوقة، ثم تنظيفها وتصنيفها وتخزينها محليًا في SQLite. يحافظ المشروع على العنوان والوصف والرابط والتاريخ واللغة الأصلية حتى يمكن تمرير المادة لاحقًا إلى مرحلة كتابة عربية طبيعية.
 
 > لا ينشر هذا الإصدار أي شيء إلى Telegram، ولا يستخدم واجهة ذكاء اصطناعي لإعادة الصياغة أو الترجمة.

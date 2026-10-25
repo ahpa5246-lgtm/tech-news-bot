@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
@@ -36,8 +36,11 @@ class SourceDocument:
 
 
 def _valid_url(url: str) -> bool:
-    parsed = urlparse(url)
-    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+    try:
+        parsed = urlparse(url)
+        return parsed.scheme in {"http", "https"} and bool(parsed.hostname)
+    except (ValueError, TypeError):
+        return False
 
 
 def _meta(soup: BeautifulSoup, *names: str) -> str | None:
@@ -74,7 +77,9 @@ def extract_article(html_bytes: bytes, final_url: str, requested_url: str) -> So
         date_raw = time_tag.get("datetime") if time_tag else None
     document.publication_date = _date_value(date_raw)
     canonical = soup.find("link", rel=lambda value: value and "canonical" in value)
-    document.canonical_url = canonical.get("href", "").strip() if canonical else None
+    canonical_href = canonical.get("href", "").strip() if canonical else ""
+    canonical_url = urljoin(final_url, canonical_href) if canonical_href else None
+    document.canonical_url = canonical_url if canonical_url and _valid_url(canonical_url) else None
     document.source_name = _meta(soup, "og:site_name", "application-name") or document.domain
     container = soup.find("article") or soup.find("main") or soup.body
     if container is None:
